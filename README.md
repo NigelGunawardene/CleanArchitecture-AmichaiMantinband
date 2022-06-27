@@ -72,6 +72,8 @@ dotnet run -- project .\BuberDinner.Api\
 
 Install Rest Client and create folders Requests/something.http
 
+dotnet add .\BuberDinner.Application\ package Microsoft.Extensions.DependencyInjection.Abstractions
+
     
 
 
