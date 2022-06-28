@@ -4,44 +4,71 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BuberDinner.Application.Common.Interfaces.Authentication;
+using BuberDinner.Application.Common.Interfaces.Persistence;
+using BuberDinner.Domain.Entities;
 
 namespace BuberDinner.Application.Services.Authentication;
 
 public class AuthenticationService : IAuthenticationService
 {
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
+    private readonly IUserRepository _userRepository;
 
-    public AuthenticationService(IJwtTokenGenerator jwtTokenGenerator)
+    public AuthenticationService(IJwtTokenGenerator jwtTokenGenerator, IUserRepository userRepository)
     {
         _jwtTokenGenerator = jwtTokenGenerator;
+        _userRepository = userRepository;
     }
 
     public AuthenticationResult Register(string firstName, string lastName, string email, string password)
     {
-        //check if user already exists
+        // Validate that the user doesnt exist
+        if (_userRepository.GetUserByEmail(email) is not null)
+        {
+            //return new AuthenticationResult(false, "User already exists");
+            throw new Exception("User with given email already exists");
+        }
 
-        // create user (generate unique ID)
+        // create user (generate unique ID) and persist to db
+        var user = new User
+        {
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            Password = password
+        };
+
+        _userRepository.Add(user);
 
         // generate token
-        Guid userId = Guid.NewGuid();
-        var token = _jwtTokenGenerator.GenerateJwtToken(userId, firstName, lastName);
+        var token = _jwtTokenGenerator.GenerateJwtToken(user);
 
         return new AuthenticationResult(
-            userId,
-            firstName,
-            lastName,
-            email,
+            user,
             token);
     }
 
     public AuthenticationResult Login(string email, string password)
     {
+        // Validate that user exists
+        if (_userRepository.GetUserByEmail(email) is not User user)
+        {
+            throw new Exception("User does not exist");
+        }
+
+        // Validate password is correct
+        if (user.Password != password)
+        {
+            throw new Exception("Invalid password");
+        }
+
+
+        // Create jwt and return to user
+
+        var token = _jwtTokenGenerator.GenerateJwtToken(user);
         return new AuthenticationResult(
-            Guid.NewGuid(),
-            "firstName",
-            "lastName",
-            email,
-            "token");
+            user,
+            token);
     }
 }
 
