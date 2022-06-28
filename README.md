@@ -74,6 +74,16 @@ Install Rest Client and create folders Requests/something.http
 
 dotnet add .\BuberDinner.Application\ package Microsoft.Extensions.DependencyInjection.Abstractions
 
+# This handles all the secrets automatically overriding them
+
+
+dotnet user-secrets init --project .\BuberDinner.Api\
+
+dotnet user-secrets set --project .\BuberDinner.Api\ "JwtSettings:Secret"  "super-secret-key-from-user-secrets"
+
+dotnet user-secrets list --project .\BuberDinner.Api\
+
+# To debug in VS Code, go to run and debug and create json thingy. (missing assets popup when you open for the first time). Then click attach and select BuberDinner.Api process
     
 
 
