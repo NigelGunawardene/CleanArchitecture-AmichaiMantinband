@@ -66,7 +66,11 @@ dotnet add .\BuberDinner.Api\ reference .\BuberDinner.Infrastructure\
 code .
 dotnet build
 
-dotnet run -- project .\BuberDinner.Api\
+dotnet run --project .\BuberDinner.Api\
+
+OR
+
+dotnet watch run --project .\BuberDinner.Api\
 
 ---
 
@@ -86,6 +90,28 @@ dotnet user-secrets list --project .\BuberDinner.Api\
 # To debug in VS Code, go to run and debug and create json thingy. (missing assets popup when you open for the first time). Then click attach and select BuberDinner.Api process
     
 
+
+# Error handling
+
+1. Middleware
+Set up middleware but disabled in program.cs. add to program.cs to use
+Code is in Middleware/ErrorHandlingMiddlware
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
+2. Filters
+Set up filter and add attribute to controller to use - [ErrorHandlingFilter] OR in program.cs
+Code is in Filters/ErrorHandlingFilterAttribute
+builder.Services.AddControllers(options => options.Filters.Add<ErrorHandlingFilterAttribute>());
+
+3. endpoint approach. added to program.cs
+Code is in Controller/ErrorsController
+app.UseExceptionHandler("/error");
+
+4. Error Factory
+This is used in conjunction with the endpoint approach. replaced the default factory
+
+Code is in Errors/BuberDinnerProblemDetailsFactory
+builder.Services.AddSingleton<ProblemDetailsFactory, BuberDinnerProblemDetailsFactory>();
 
 
 
