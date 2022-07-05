@@ -4,12 +4,14 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-
+using FluentResults;
 
 namespace BuberDinner.Application.Common.Errors;
-public record struct DuplicateEmailError : IError // using fluentResults IError and not my own // was record struct, changing to class
+public class DuplicateEmailError : IError // using fluentResults IError
 {
-    public HttpStatusCode StatusCode => HttpStatusCode.Conflict;
+    public List<IError> Reasons => throw new NotImplementedException();
 
-    public string ErrorMessage => "Email already exists - thrown from DuplicateEmailError, extending IError and library OneOf";
+    public string Message => throw new NotImplementedException();
+
+    public Dictionary<string, object> Metadata => throw new NotImplementedException();
 }
