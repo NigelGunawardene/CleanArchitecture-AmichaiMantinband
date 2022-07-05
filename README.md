@@ -78,6 +78,27 @@ Install Rest Client and create folders Requests/something.http
 
 dotnet add .\BuberDinner.Application\ package Microsoft.Extensions.DependencyInjection.Abstractions
 
+
+# Chapters
+
+### Chapter 1
+Setup
+
+### Chapter 2
+Authentication - generating JWT Tokens
+
+### Chapter 3
+Repository pattern
+
+### Chapter 4
+Global error handling
+
+### Chapter 5
+Flow control
+
+
+
+
 # This handles all the secrets automatically overriding them
 
 
