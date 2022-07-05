@@ -68,7 +68,6 @@ public class AuthenticationController : ApiController
         //return Problem(statusCode: StatusCodes.Status409Conflict, title: "Email already exists - thrown from AuthenticationController");
     }
 
-
     [HttpPost("login")]
     public IActionResult Login(LoginRequest request)
     {
