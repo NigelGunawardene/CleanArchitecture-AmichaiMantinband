@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BuberDinner.Application.Common.Interfaces.Authentication;
+﻿using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Domain.Entities;
+using ErrorOr;
+using BuberDinner.Domain.Common.Errors;
 
 namespace BuberDinner.Application.Services.Authentication;
 
@@ -20,13 +17,12 @@ public class AuthenticationService : IAuthenticationService
         _userRepository = userRepository;
     }
 
-    public AuthenticationResult Register(string firstName, string lastName, string email, string password)
+    public ErrorOr<AuthenticationResult> Register(string firstName, string lastName, string email, string password)
     {
         // Validate that the user doesnt exist
         if (_userRepository.GetUserByEmail(email) is not null)
         {
-            //return new AuthenticationResult(false, "User already exists");
-            throw new Exception("User with given email already exists");
+            return Errors.User.DuplicateEmail;
         }
 
         // create user (generate unique ID) and persist to db
@@ -48,18 +44,20 @@ public class AuthenticationService : IAuthenticationService
             token);
     }
 
-    public AuthenticationResult Login(string email, string password)
+    // In this single method, we can return an error, list of errors or the intended object.
+    public ErrorOr<AuthenticationResult> Login(string email, string password)
     {
         // Validate that user exists
         if (_userRepository.GetUserByEmail(email) is not User user)
         {
-            throw new Exception("User does not exist");
+            //throw new Exception("User does not exist");
+            return Errors.Authentication.InvalidCredentials;
         }
 
         // Validate password is correct
         if (user.Password != password)
         {
-            throw new Exception("Invalid password");
+            return new[] { Errors.Authentication.InvalidCredentials };
         }
 
 
