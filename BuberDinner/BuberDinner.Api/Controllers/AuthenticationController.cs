@@ -24,19 +24,28 @@ public class AuthenticationController : ControllerBase
     {
         var registerResult = _authenticationService.Register(request.FirstName, request.LastName, request.Email, request.Password);
 
-        if (registerResult.IsSuccess)
-        {
-            return Ok(MapAuthResult(registerResult.Value));
-        }
+        // ErrorOr library
+        return registerResult.MatchFirst(
+            authResult => Ok(MapAuthResult(authResult)),
+            firstError => Problem(statusCode: StatusCodes.Status409Conflict, title: firstError.Description)
+            );
 
-        var firstError = registerResult.Errors[0];
-        if (firstError is DuplicateEmailError)
-        {
-            return Problem(statusCode: StatusCodes.Status409Conflict, title: "Email already exists - thrown from FluentResults DuplicateEmailError");
-        }
+        // FluentResults Library --------------------------------------------------------------------
+        //if (registerResult.IsSuccess)
+        //{
+        //    return Ok(MapAuthResult(registerResult.Value));
+        //}
 
-        return Problem();
+        //var firstError = registerResult.Errors[0];
+        //if (firstError is DuplicateEmailError)
+        //{
+        //    return Problem(statusCode: StatusCodes.Status409Conflict, title: "Email already exists - thrown from FluentResults DuplicateEmailError");
+        //}
 
+        //return Problem();
+
+
+        // OneOf Library --------------------------------------------------------------------
         // when using OneOf, we can use this method, since there are only 2 possible responses.
         //return registerResult.Match(
         //    authResult => Ok(MapAuthResult(authResult)),

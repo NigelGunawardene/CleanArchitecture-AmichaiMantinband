@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using BuberDinner.Application.Common.Errors;
 using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Persistence;
+using BuberDinner.Domain.Common.Errors;
 using BuberDinner.Domain.Entities;
+using ErrorOr;
 using FluentResults;
 using OneOf;
 
@@ -23,8 +25,9 @@ public class AuthenticationService : IAuthenticationService
         _userRepository = userRepository;
     }
 
-    //public OneOf<AuthenticationResult, IError> Register(string firstName, string lastName, string email, string password)
-    public Result<AuthenticationResult> Register(string firstName, string lastName, string email, string password)
+    //public OneOf<AuthenticationResult, IError> Register(string firstName, string lastName, string email, string password) // oneof library
+    //public Result<AuthenticationResult> Register(string firstName, string lastName, string email, string password) // fluentresults library
+    public ErrorOr<AuthenticationResult> Register(string firstName, string lastName, string email, string password) // ErrorOr
     {
         // Validate that the user doesnt exist
         if (_userRepository.GetUserByEmail(email) is not null)
@@ -32,7 +35,8 @@ public class AuthenticationService : IAuthenticationService
             //return new AuthenticationResult(false, "User already exists");
             //throw new DuplicateEmailException(); //Exception("User with given email already exists - normal exception")
             //return new DuplicateEmailError(); // when using OneOf, we could return it like this. Now using FluentResults
-            return Result.Fail<AuthenticationResult>(new[] { new DuplicateEmailError() });
+            //return Result.Fail<AuthenticationResult>(new[] { new DuplicateEmailError() });  // fluentresults library
+            return Errors.User.DuplicateEmail;
         }
 
         // create user (generate unique ID) and persist to db
@@ -54,18 +58,19 @@ public class AuthenticationService : IAuthenticationService
             token);
     }
 
-    public AuthenticationResult Login(string email, string password)
+    public ErrorOr<AuthenticationResult> Login(string email, string password)
     {
         // Validate that user exists
         if (_userRepository.GetUserByEmail(email) is not User user)
         {
-            throw new Exception("User does not exist");
+            //throw new Exception("User does not exist");
+            return Errors.Authentication.InvalidCredentials;
         }
 
         // Validate password is correct
         if (user.Password != password)
         {
-            throw new Exception("Invalid password");
+            return new[] { Errors.Authentication.InvalidCredentials };
         }
 
 

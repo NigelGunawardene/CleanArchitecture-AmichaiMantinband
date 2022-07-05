@@ -125,16 +125,21 @@ Flow control
 
 Removed filters and middleware error handling as they are not needed. Only using endpoint approach - ErrorController
 
-2 appraoches to flow control
-1 - used at Microsoft and fairly common - 
-Install OneOf package
+FOUR appraoches to flow control
+
+1 - via Exceptions - not that good.
+
+2 - used at Microsoft and fairly common - 
+Install OneOf package into application project
 Create IError interface, extend it in DuplicateEmailEror and use it in the controller. This is nice.
 
-2 - 
-Install FluentResults
+3 - 
+Install FluentResults into application project
 Similar to OneOf it is a Discriminated Union
-Instead of us having to define more and more results, it will always contain either the class that is defined, or a list of errors 
+Instead of us having to define more and more results, it will always contain either the class that is defined, or a list of errors. You can either return an object that we define because it has an implicit converter from an authenticationresult, or return an error 
 
+4 - Using ErrorOr and domain level exceptions
+Install ErrorOr into domain project
 
 
 

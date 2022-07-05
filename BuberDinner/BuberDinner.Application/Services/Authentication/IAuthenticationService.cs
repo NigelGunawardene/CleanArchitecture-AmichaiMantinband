@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BuberDinner.Application.Common.Errors;
+using ErrorOr;
 using FluentResults;
 using OneOf;
 
@@ -16,7 +17,8 @@ public interface IAuthenticationService
     //AuthenticationResult Register(string firstName, string lastName, string email, string password);
     //AuthenticationResult Login(string email, string password);
     //OneOf<AuthenticationResult, IError> Register(string firstName, string lastName, string email, string password);
-    Result<AuthenticationResult> Register(string firstName, string lastName, string email, string password);
-    AuthenticationResult Login(string email, string password);
+    //Result<AuthenticationResult> Register(string firstName, string lastName, string email, string password); // this is fluentresults. commenting cos we are gonna use ErrorOr
+    ErrorOr<AuthenticationResult> Register(string firstName, string lastName, string email, string password);
+    ErrorOr<AuthenticationResult> Login(string email, string password);
 }
 
