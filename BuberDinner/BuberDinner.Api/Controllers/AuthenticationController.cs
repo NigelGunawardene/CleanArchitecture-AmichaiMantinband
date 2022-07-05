@@ -7,7 +7,7 @@ namespace BuberDinner.Api.Controllers;
 
 [ApiController]
 [Route("auth")]
-//[ErrorHandlingFilter]
+//[ErrorHandlingFilter] // either add this here or in program.cs
 public class AuthenticationController : ControllerBase
 {
 
