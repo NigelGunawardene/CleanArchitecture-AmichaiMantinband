@@ -3,13 +3,14 @@ using BuberDinner.Application.Common.Errors;
 using BuberDinner.Application.Services.Authentication;
 using BuberDinner.Contracts.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using BuberDinner.Domain.Common.Errors;
 
 namespace BuberDinner.Api.Controllers;
 
-[ApiController]
+//[ApiController] // since this attribute will be on all controllers that extend from our ApiController class, we can just move this annotation to the ApiController class
 [Route("auth")]
 //[ErrorHandlingFilter]
-public class AuthenticationController : ControllerBase
+public class AuthenticationController : ApiController
 {
 
     private readonly IAuthenticationService _authenticationService;
@@ -25,10 +26,16 @@ public class AuthenticationController : ControllerBase
         var registerResult = _authenticationService.Register(request.FirstName, request.LastName, request.Email, request.Password);
 
         // ErrorOr library
-        return registerResult.MatchFirst(
-            authResult => Ok(MapAuthResult(authResult)),
-            firstError => Problem(statusCode: StatusCodes.Status409Conflict, title: firstError.Description)
-            );
+
+        return registerResult.Match(
+   authResult => Ok(MapAuthResult(authResult)),
+        errors => Problem(errors) // pass this to the method defined in the ApiController class
+    );
+
+        //return registerResult.MatchFirst(
+        //    authResult => Ok(MapAuthResult(authResult)),
+        //    firstError => Problem(statusCode: StatusCodes.Status409Conflict, title: firstError.Description)
+        //    );
 
         // FluentResults Library --------------------------------------------------------------------
         //if (registerResult.IsSuccess)
@@ -66,9 +73,27 @@ public class AuthenticationController : ControllerBase
     public IActionResult Login(LoginRequest request)
     {
         var authResult = _authenticationService.Login(request.Email, request.Password);
-        var response = new AuthenticationResponse(authResult.User.Id, authResult.User.FirstName, authResult.User.LastName, authResult.User.Email, authResult.Token);
-        return Ok(response);
+
+
+        //
+        if (authResult.IsError && authResult.FirstError == Errors.Authentication.InvalidCredentials)
+        {
+            return Problem(statusCode: StatusCodes.Status401Unauthorized, title: authResult.FirstError.Description);
+        }
+
+
+        return authResult.Match(
+   authResult => Ok(MapAuthResult(authResult)),
+        errors => Problem(errors) // pass this to the method defined in the ApiController class
+        );
+
+
+        //var response = new AuthenticationResponse(authResult.User.Id, authResult.User.FirstName, authResult.User.LastName, authResult.User.Email, authResult.Token);
+        //return Ok(response);
     }
+
+
+
     private static AuthenticationResponse MapAuthResult(AuthenticationResult authResult)
     {
         return new AuthenticationResponse(authResult.User.Id, authResult.User.FirstName, authResult.User.LastName, authResult.User.Email, authResult.Token);

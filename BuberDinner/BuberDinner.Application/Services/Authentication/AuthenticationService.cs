@@ -60,6 +60,8 @@ public class AuthenticationService : IAuthenticationService
 
     public ErrorOr<AuthenticationResult> Login(string email, string password)
     {
+
+        // In a single method, we can return either the desired object, an error or a list of errors
         // Validate that user exists
         if (_userRepository.GetUserByEmail(email) is not User user)
         {
