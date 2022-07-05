@@ -1,5 +1,4 @@
 ﻿using BuberDinner.Api.Errors;
-using BuberDinner.Api.Filters;
 using BuberDinner.Application;
 using BuberDinner.Infrastructure;
 using Microsoft.AspNetCore.Diagnostics;
@@ -12,14 +11,13 @@ var builder = WebApplication.CreateBuilder(args);
         .AddApplication()
         .AddInfrastructure(builder.Configuration);
 
-    builder.Services.AddControllers(options => options.Filters.Add<ErrorHandlingFilterAttribute>()); // use for config and dependency injection
-
     builder.Services.AddControllers();
 
 }
 
 var app = builder.Build();
 {
+    app.UseExceptionHandler("/error");
     app.UseHttpsRedirection();
     app.MapControllers();
 
