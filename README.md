@@ -82,35 +82,20 @@ dotnet add .\BuberDinner.Application\ package Microsoft.Extensions.DependencyInj
 # Chapters
 
 ### Chapter 1
+
 Setup
 
 ### Chapter 2
+
 Authentication - generating JWT Tokens
 
 ### Chapter 3
+
 Repository pattern
 
 ### Chapter 4
+
 Global error handling
-
-### Chapter 5
-Flow control
-
-
-
-
-# This handles all the secrets automatically overriding them
-
-
-dotnet user-secrets init --project .\BuberDinner.Api\
-
-dotnet user-secrets set --project .\BuberDinner.Api\ "JwtSettings:Secret"  "super-secret-key-from-user-secrets"
-
-dotnet user-secrets list --project .\BuberDinner.Api\
-
-# To debug in VS Code, go to run and debug and create json thingy. (missing assets popup when you open for the first time). Then click attach and select BuberDinner.Api process
-    
-
 
 # Error handling
 
@@ -133,6 +118,32 @@ This is used in conjunction with the endpoint approach. replaced the default fac
 
 Code is in Errors/BuberDinnerProblemDetailsFactory
 builder.Services.AddSingleton<ProblemDetailsFactory, BuberDinnerProblemDetailsFactory>();
+
+
+### Chapter 5
+Flow control
+
+Removed filters and middleware error handling as they are not needed. Only using endpoint approach - ErrorController
+
+2 appraoches to flow control
+1 - used at Microsoft and fairly common - 
+Install OneOf package
+
+
+
+# This handles all the secrets automatically overriding them
+
+
+dotnet user-secrets init --project .\BuberDinner.Api\
+
+dotnet user-secrets set --project .\BuberDinner.Api\ "JwtSettings:Secret"  "super-secret-key-from-user-secrets"
+
+dotnet user-secrets list --project .\BuberDinner.Api\
+
+# To debug in VS Code, go to run and debug and create json thingy. (missing assets popup when you open for the first time). Then click attach and select BuberDinner.Api process
+    
+
+
 
 
 

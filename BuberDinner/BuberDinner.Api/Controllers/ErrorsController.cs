@@ -14,7 +14,10 @@ public class ErrorsController : ControllerBase
 
         var (statusCode, message) = exception switch
         {
-            DuplicateEmailException _ => (StatusCodes.Status409Conflict, "Email already exists from flow control - DuplicateEmailException"), // this is a security risk. dont confirm that the email exists
+            //DuplicateEmailException _ => (StatusCodes.Status409Conflict, "Email already exists from flow control - DuplicateEmailException"), // this is a security risk. dont confirm that the email exists
+            //_ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
+
+            IServiceException serviceException => ((int)serviceException.StatusCode, serviceException.ErrorMessage),
             _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred")
         };
         return Problem(statusCode: statusCode, title: message); // can add title: exception.Message, statusCode: 400
