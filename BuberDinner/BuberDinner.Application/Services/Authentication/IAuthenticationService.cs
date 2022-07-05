@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BuberDinner.Application.Common.Errors;
+using FluentResults;
 using OneOf;
 
 
@@ -14,7 +15,8 @@ public interface IAuthenticationService
 {
     //AuthenticationResult Register(string firstName, string lastName, string email, string password);
     //AuthenticationResult Login(string email, string password);
-    OneOf<AuthenticationResult, DuplicateEmailError> Register(string firstName, string lastName, string email, string password);
+    //OneOf<AuthenticationResult, IError> Register(string firstName, string lastName, string email, string password);
+    Result<AuthenticationResult> Register(string firstName, string lastName, string email, string password);
     AuthenticationResult Login(string email, string password);
 }
 

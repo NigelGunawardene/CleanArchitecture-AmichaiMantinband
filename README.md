@@ -128,6 +128,13 @@ Removed filters and middleware error handling as they are not needed. Only using
 2 appraoches to flow control
 1 - used at Microsoft and fairly common - 
 Install OneOf package
+Create IError interface, extend it in DuplicateEmailEror and use it in the controller. This is nice.
+
+2 - 
+Install FluentResults
+Similar to OneOf it is a Discriminated Union
+Instead of us having to define more and more results, it will always contain either the class that is defined, or a list of errors 
+
 
 
 
