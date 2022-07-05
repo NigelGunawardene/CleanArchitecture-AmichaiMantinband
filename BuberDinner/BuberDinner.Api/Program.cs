@@ -1,4 +1,4 @@
-﻿using BuberDinner.Api.Errors;
+﻿using BuberDinner.Api.Common.Errors;
 using BuberDinner.Api.Filters;
 using BuberDinner.Api.Middleware;
 using BuberDinner.Application;
@@ -12,11 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services
         .AddApplication()
         .AddInfrastructure(builder.Configuration);
-    //builder.Services.AddApplication();
-    //builder.Services.AddInfrastructure();
-
-    // disabling this as well (after middleware)
-    //builder.Services.AddControllers(options => options.Filters.Add<ErrorHandlingFilterAttribute>()); // use for config and dependency injection
 
     builder.Services.AddControllers();
 
@@ -25,23 +20,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 {
-    // commenting this out in order to not use the middleware approach for now
-    //app.UseMiddleware<ErrorHandlingMiddleware>();
-
-    // 3rd approach to error handling - error endpoint
-    app.UseExceptionHandler("/error"); // this is used in conjunction with the factory 
-
-
-    // Instead of doing builder.Services.AddSingleton<ProblemDetailsFactory, BuberDinnerProblemDetailsFactory>();, we can also do:
-    //app.Map("/error", (HttpContext httpContext) =>
-    //{
-    //    Exception? exception = httpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
-    //    return Results.Problem();
-    //});
+    app.UseExceptionHandler("/error");
 
     app.UseHttpsRedirection();
     app.MapControllers();
-
     app.Run();
 }
 
