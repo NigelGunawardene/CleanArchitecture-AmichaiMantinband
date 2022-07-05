@@ -11,6 +11,6 @@ public static partial class Errors
 {
     public static class Authentication
     {
-        public static Error InvalidCredentials => Error.Conflict(code: "Auth.InvalidCred", description: "Invalid credentials - thrown from ErrorOr - Errors.Authentication.cs in domain layer");
+        public static Error InvalidCredentials => Error.Validation(code: "Auth.InvalidCred", description: "Invalid credentials - thrown from ErrorOr - Errors.Authentication.cs in domain layer");
     }
 }
