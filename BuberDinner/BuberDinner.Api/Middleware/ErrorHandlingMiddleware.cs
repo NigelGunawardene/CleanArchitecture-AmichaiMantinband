@@ -4,7 +4,6 @@ using Newtonsoft.Json;
 namespace BuberDinner.Api.Middleware;
 
 
-// this is the middleware approach to error handling. we will now disable it from the program.cs
 public class ErrorHandlingMiddleware
 {
     private readonly RequestDelegate _next;
