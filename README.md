@@ -155,7 +155,16 @@ dotnet user-secrets list --project .\BuberDinner.Api\
 # To debug in VS Code, go to run and debug and create json thingy. (missing assets popup when you open for the first time). Then click attach and select BuberDinner.Api process
     
 
+### Chapter 6
 
+In chapter 6, first we split the AuthenticationService into Commands and queries - AuthenticationCommandService and AuthenticationQueryService.
+
+However, these are still services. It follows the CQRS pattern(Am I changing anything?)
+
+Chapter 6 - part 2 - we implement Mediatr. We create commands, queries and handlers.
+Create RegisterCommandHandler, implement relevant interface, copy logic from register service. Can get rid of the Services folder with Authenticaion
+
+Important to note that at the moment, in the LoginQuery and AuthenticationResult, we return User. User is a domain entity (and potential aggregate) but one of the main motications for CQRS in DDD is to have the response as slim as possible. Therefore we will implement a slim UserDto to use here with only the necessary data
 
 
 

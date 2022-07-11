@@ -1,41 +1,40 @@
-﻿using BuberDinner.Api.Filters;
-using BuberDinner.Application.Common.Errors;
-using BuberDinner.Application.Services.Authentication.Commands;
-using BuberDinner.Application.Services.Authentication.Queries;
-using BuberDinner.Contracts.Authentication;
-using Microsoft.AspNetCore.Mvc;
-using BuberDinner.Domain.Common.Errors;
+﻿using BuberDinner.Application.Authentication.Commands.Register;
+using BuberDinner.Application.Authentication.Queries.Login;
 using BuberDinner.Application.Services.Authentication.Common;
+using BuberDinner.Contracts.Authentication;
+using BuberDinner.Domain.Common.Errors;
+using ErrorOr;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BuberDinner.Api.Controllers;
 
-//[ApiController] // since this attribute will be on all controllers that extend from our ApiController class, we can just move this annotation to the ApiController class
 [Route("auth")]
-//[ErrorHandlingFilter]
 public class AuthenticationController : ApiController
 {
+    // normally this would be fine. But since we practice I in SOLID, interface segregation principle, we dont use IMediator, but use ISender/IPublisher
+    private readonly ISender _sender;
 
-    private readonly IAuthenticationCommandService _authenticationCommandService;
-    private readonly IAuthenticationQueryService _authenticationQueryService;
-
-    public AuthenticationController(IAuthenticationCommandService authenticationService, IAuthenticationQueryService authenticationQueryService)
+    public AuthenticationController(ISender mediator)
     {
-        _authenticationCommandService = authenticationService;
-        _authenticationQueryService = authenticationQueryService;
+        _sender = mediator;
     }
 
     [HttpPost("register")]
-    public IActionResult Register(RegisterRequest request)
+    public async Task<IActionResult> Register(RegisterRequest request)
     {
-        var registerResult = _authenticationCommandService.Register(request.FirstName, request.LastName, request.Email, request.Password);
+        var command = new RegisterCommand(request.FirstName, request.LastName, request.Email, request.Password);
+        ErrorOr<AuthenticationResult> authResult = await _sender.Send(command);
 
-        return registerResult.Match(authResult => Ok(MapAuthResult(authResult)), errors => Problem(errors)); // pass this to the method defined in the ApiController class
+        return authResult.Match(authResult => Ok(MapAuthResult(authResult)), errors => Problem(errors)); // pass this to the method defined in the ApiController class
+
     }
 
     [HttpPost("login")]
-    public IActionResult Login(LoginRequest request)
+    public async Task<IActionResult> Login(LoginRequest request)
     {
-        var authResult = _authenticationQueryService.Login(request.Email, request.Password);
+        var query = new LoginQuery(request.Email, request.Password);
+        var authResult = await _sender.Send(query);
 
         if (authResult.IsError && authResult.FirstError == Errors.Authentication.InvalidCredentials)
         {
