@@ -1,0 +1,17 @@
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Net;
+//using System.Text;
+//using System.Threading.Tasks;
+
+//namespace BuberDinner.Application.Common.Errors;
+//public interface IError
+//{
+//    public HttpStatusCode StatusCode { get; }
+
+//    public string ErrorMessage { get; }
+//}
+
+
+// Commenting this out as we are going to use fluentresults interface instead of this
