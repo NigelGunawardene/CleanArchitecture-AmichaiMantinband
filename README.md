@@ -166,6 +166,104 @@ Create RegisterCommandHandler, implement relevant interface, copy logic from reg
 
 Important to note that at the moment, in the LoginQuery and AuthenticationResult, we return User. User is a domain entity (and potential aggregate) but one of the main motications for CQRS in DDD is to have the response as slim as possible. Therefore we will implement a slim UserDto to use here with only the necessary data
 
+### Chapter 7
+
+Adding Mapster
+
+Mapster is a mapping library. Lets say we have
+
+```json
+public record User(
+  int Id,
+  string FirstName,
+  string LastName);
+
+```
+
+AND
+
+```json
+public record UserResponse(
+  int Id,
+  string FirstName,
+  string LastName);
+
+```
+
+Then we can just do - var userResponse = user.Adapt<UserResponse>();
+
+We can also set rules and pass a config (or use global config) - 
+var config = new TypeAdapterConfig();
+config.NewConfig<User, UserResponse>().Map(dest => dest.FullName, src => $"{src.FirstName} {src.LastName}")
+var userResponse = user.Adapt<UserResponse>(config);
+
+
+There is also a global config that is public and static. To use - 
+var config = TypeAdapterConfig.GlobalSettings; OR TypeAdapterConfig<User, UserResponse>.NewConfig().Map......
+config.NewConfig<User, UserResponse>().Map(dest => dest.FullName, src => $"{src.FirstName} {src.LastName}")
+
+
+if you want multiple rules for the same conversion, like user to userresponse, we can use config.ForType
+
+we can ignore non mapped fields by using .IgnoreNonMapped
+
+we can also map conditionally with a 3rd argument, like - 
+config.NewConfig<User, UserResponse>().Map(
+  dest => dest.FullName, 
+  src => $"{src.FirstName} {src.LastName}",
+  src => src.FirstName.StartsWith("a", StringComparison.OrdinalIgnoreCase))
+
+
+We can also combine objects when mapping like using a Tuple - 
+TypeAdapterConfig<(User User, Guid TraceId), UserResponse>.NewConfig()
+  .Map(dest => dest.TraceId, src => src.TraceId)
+  .Map(dest => dest, src => src.User);
+
+var userResponse = (user, traceId).Adapt<UserResponse>();
+
+Theres also BeforeMapping and AfterMapping methods
+
+3 main types of configurations - 
+
+1. Type mappings - one type to anotehr type
+2. Global mappings
+3. ForDestinationType
+
+Lets say we have an interface called IValidatable - and it has a method called Validate. Lets say UserResponse implements this interface.
+
+If we want to call this method whenever we initialize an object of this class, we can do - 
+config.ForDestinationType<IValidatable>().AfterMapping(dest => dest.Validate())
+
+TypeAdapterConfig.GlobalSettings.Default.MapToConstructor(true);
+
+Additionally, instead of using the Adapt method, we can also do - 
+IMapper mapper = new Mapper();
+var userResponse = mapper.Map<UserResponse>(user);
+
+CODE - 
+
+Add Mapster and Mapster>DependencyInjection to API project
+In the controller, any mapping that exists currently can be replaced with 
+_mapper.Map<destinationClassName>(sourceObject)
+
+In this scenario, RegisterRequest and RegisterCommand, we well as LoginRequest and LoginCommand
+will work out of the box because they have the same properties.
+
+AuthenticationResult to AuthenticationResult will need configuration
+so we create APIProject/Common/Mapping/AuthenticationMappingConfig
+Implement the IRegister interface
+
+Because we want mapster to handle its own dependencyinjection, we create a file inside the same folder for this, called DependencyInjection
+
+After configuring Mapster DI, we create another DI file for the presentation layer. We add the AddMappings method there, as well as move the other presentation layer related config like controllers into the presentation DI file and just called the Presentation layer DI method in Program.cs
+
+
+
+
+
+
+
+
 
 
 
