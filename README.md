@@ -119,6 +119,8 @@ This is used in conjunction with the endpoint approach. replaced the default fac
 Code is in Errors/BuberDinnerProblemDetailsFactory
 builder.Services.AddSingleton<ProblemDetailsFactory, BuberDinnerProblemDetailsFactory>();
 
+BuberDinnerProblemDetailsFactory was created by using the Microsoft aspnetcore github. VS extensions were installed for this. Control shift P and type aspnetcore, can open the source code in VS. Can also clone and run in docker using github containers
+
 
 ### Chapter 5
 Flow control
