@@ -258,6 +258,95 @@ Because we want mapster to handle its own dependencyinjection, we create a file 
 After configuring Mapster DI, we create another DI file for the presentation layer. We add the AddMappings method there, as well as move the other presentation layer related config like controllers into the presentation DI file and just called the Presentation layer DI method in Program.cs
 
 
+### Chapter 8
+
+#### Validation Behavior - FluentValidation
+
+Mediator pipeline behaviors. We are going to validate a request in mediator before it reaches its corresponding handler
+
+Create folder Application/Common/Behaviors and create ValidationBehaviors.cs. Add Mediator IpipelineBehavior classes
+To wire it together, in Program.cs, add - 
+```
+        services.AddScoped<IPipelineBehavior<RegisterCommand, ErrorOr<AuthenticationResult>>, ValidateRegisterCommandBehavior>();
+```
+
+what happens is that before mediator invokes our handler, it wraps it in whatever class implements the IPipeline Behavior class where the type corresponds to the type of the request that it is currently executing 
+
+Add FluentValidation to Application project
+
+Because we are using Mediator to split our features (each feature sits in its own contained folder), we can just create Validators inside the folders
+
+So we create (inside the Commands/Register folder). AbstractValidator is from FluentValidation
+
+```
+RegisterCommandValidator : AbstractValidator<RegisterCommand>
+```
+
+Add validation to this class. Then add it in DI 
+
+ ```
+         services.AddScoped<IValidator<RegisterCommand>, RegisterCommandValidator>();
+```
+
+Or if we dont want to add each and every validator like this, install the FluentValidator aspnetcore package. Then you can replace the above line with - services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
