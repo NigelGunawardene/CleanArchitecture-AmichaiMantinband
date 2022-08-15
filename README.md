@@ -290,6 +290,25 @@ Add validation to this class. Then add it in DI
 
 Or if we dont want to add each and every validator like this, install the FluentValidator aspnetcore package. Then you can replace the above line with - services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
+Then we inject it into our ValidateRegisterCommandBehavior so we can use it like this - 
+var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+
+If there were no validation errors, we invoke our handler using next()
+If there were errors, then we have a list of errors in validationResult, and we are going to convert them to Errors using ErrorOr and then return them
+
+#### Implementing a generic validation pipeline behavior
+Next - we want to change the ValidationBehavior to work for any request type, and not just Register. So we change our class to use Generics
+
+IPipelineBehavior<TRequest, TResponse>where TRequest is a mediator request and TResponse is whatever the request returns
+
+If you have multiple validators for a particular request type, you can call all of them in the constructor and iterate through and invoke all of them in the Handle method
+
+Then add dependency in DI -
+```
+services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+```
+
+
 
 
 
