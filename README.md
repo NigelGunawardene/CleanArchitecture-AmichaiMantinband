@@ -310,6 +310,121 @@ Then add dependency in DI -
 services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 ```
 
+### Chapter 9
+
+#### JWT Bearer Authentication in ASP.NET 6
+
+#### JWT
+
+'''json
+// Header (algorithm and token type)
+{ 
+    "alg" : "H256",
+    "typ" : "JWT",
+    "cty" : "JWT"
+}
+```
+
+'''json
+// Payload data
+{ 
+    "sub" : "SOME-GUID",
+    "given-name" : "Nigel",
+    "family-name" : "Gunawardene",
+    "jti" : "SOME-GUID",
+    "exp" : 111111223,
+    "iss" : "BuberDinner",
+    "aud" : "BuberDinner"
+}
+```
+
+'''json
+// Signature
+HMACSHA256(
+$"{base64UrlEncode(header)}.{base64UrlEncode(payload)}","super-secret-key")
+```
+
+We generate a token when the user logs in. BuberDinner is the issuer and the audience. 
+We use the HMACSHA256 algorithm to sign the token with the super secret key (which is exactly 16 bytes)
+
+This will be called in the login endpoint, and will return a token in the response.
+
+Generally, you will have 2 separate systems
+One will be the identity provider - like AAD which will generate the token
+Backend will have to get the public key and validate the token, but in this example, since we are the issuer and the system, we can use Asymmetric key
+
+go to program.cs
+
+Add -  app.UseAuthentication();
+
+To make things simpler, in the Infrastructure DependencyInjection class - 
+Create a new method called AddAuth, move auth lines to that, and call it in the AddInfrastructure method
+
+Now we need to add the Dependencies that the authentication middleware needs, and we need to specify what we want to validate.
+
+Add the Microsoft.AspNetCore.Authentication.JwtBearer package
+
+AuthenticationScheme is simple the "Bearer" scheme
+
+AddAuthentication adds the depencendies and also returns the AuthenticationBuilder, which internally has a map between the authentication scheme and the corresponding authentication handler
+and what we want to do is add our Jwt Bearer Handler as the Authentication handler for the bearer authentication scheme
+
+The actual authentication handler validates the token and makes sure its legit and populates the Identity of the User. We pass the params that we want to validate when configuring the services. 
+
+#### Authorization
+
+Now we have set up authentication, but to determine if an authenticated user is able to access an endpoint or not, we need to setup authorization - 
+
+In the Presentation DependencyInjection, it already calls AddControllers, which calls AddAuthorization for us, so  we dont have to add the dependencies for that.
+
+We need to do add - app.UseAuthorization(); in program.cs
+
+In our pipeline, we hit the useAuthentication (authentication middleware) which finds the correct authentication handler which knows how to handle the bearer authentication scheme (JwtBearerHandler) and it gets whether or not the user is authenticated.
+
+After that, we call the next middleware - Authorization middleware, which decides if the user can actually access the endpoitn
+
+We add the [Authorization] attribute to our ApiController, so that it applies to all controllers that extend it, and we add [AllowAnonymous] to our AuthenticationController so that it can be accessed without authentication.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

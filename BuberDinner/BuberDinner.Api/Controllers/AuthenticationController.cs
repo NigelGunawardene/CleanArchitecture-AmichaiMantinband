@@ -6,11 +6,13 @@ using BuberDinner.Domain.Common.Errors;
 using ErrorOr;
 using MapsterMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BuberDinner.Api.Controllers;
 
 [Route("auth")]
+[AllowAnonymous]
 public class AuthenticationController : ApiController
 {
     // normally this would be fine. But since we practice I in SOLID, interface segregation principle, we dont use IMediator, but use ISender/IPublisher

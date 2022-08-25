@@ -1,5 +1,6 @@
 ﻿using BuberDinner.Api.Common.Http;
 using ErrorOr;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace BuberDinner.Api.Controllers;
 
 [ApiController]// any class that extends this controller will get this attribute
+[Authorize]
 public class ApiController : ControllerBase
 {
     protected IActionResult Problem(List<Error> errors)
