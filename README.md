@@ -371,6 +371,23 @@ and what we want to do is add our Jwt Bearer Handler as the Authentication handl
 
 The actual authentication handler validates the token and makes sure its legit and populates the Identity of the User. We pass the params that we want to validate when configuring the services. 
 
+#### Authorization
+
+Now we have set up authentication, but to determine if an authenticated user is able to access an endpoint or not, we need to setup authorization - 
+
+In the Presentation DependencyInjection, it already calls AddControllers, which calls AddAuthorization for us, so  we dont have to add the dependencies for that.
+
+We need to do add - app.UseAuthorization(); in program.cs
+
+In our pipeline, we hit the useAuthentication (authentication middleware) which finds the correct authentication handler which knows how to handle the bearer authentication scheme (JwtBearerHandler) and it gets whether or not the user is authenticated.
+
+After that, we call the next middleware - Authorization middleware, which decides if the user can actually access the endpoitn
+
+We add the [Authorization] attribute to our ApiController, so that it applies to all controllers that extend it, and we add [AllowAnonymous] to our AuthenticationController so that it can be accessed without authentication.
+
+
+
+
 
 
 
