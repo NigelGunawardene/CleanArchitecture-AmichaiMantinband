@@ -385,6 +385,19 @@ After that, we call the next middleware - Authorization middleware, which decide
 
 We add the [Authorization] attribute to our ApiController, so that it applies to all controllers that extend it, and we add [AllowAnonymous] to our AuthenticationController so that it can be accessed without authentication.
 
+### Chapter 11
+
+#### Modeling Domains
+
+In this chapter we looked at modeling complex domains before implementing them in our application.
+Link - https://www.youtube.com/watch?v=f6G46rqkePc
+We want to have as many aggregates as possible. This is because each Aggregate is a TRANSACTIONAL BOUNDARY. 
+Bigger aggregates means more work to be done if there is a change to be made. 
+For example, in a menu, we have entities like Host, Dinner and Reviews. If a change is made, we would have to change the entire object. Instead of this, we can remove Host, Dinner and Reviews and replace them with hostId, dinnerId and reviewIds. (Host, Dinner and Reviews will be their own aggregate) In this way, aggregates can refer to each other. Aggregate root in this case would be Menu. 
+When aggregates want to refer to one another, they do it by ID.
+We create a value object which has a single property (the ID of the other aggregate) 
+
+An aggregate is a collection of one or more related entities (and possibly value objects). Each aggregate has a single root entity, referred to as the aggregate root. The aggregate root is responsible for controlling access to all of the members of its aggregate.
 
 
 
