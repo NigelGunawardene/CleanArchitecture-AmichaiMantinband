@@ -119,6 +119,8 @@ This is used in conjunction with the endpoint approach. replaced the default fac
 Code is in Errors/BuberDinnerProblemDetailsFactory
 builder.Services.AddSingleton<ProblemDetailsFactory, BuberDinnerProblemDetailsFactory>();
 
+BuberDinnerProblemDetailsFactory was created by using the Microsoft aspnetcore github. VS extensions were installed for this. Control shift P and type aspnetcore, can open the source code in VS. Can also clone and run in docker using github containers
+
 
 ### Chapter 5
 Flow control
@@ -165,6 +167,340 @@ Chapter 6 - part 2 - we implement Mediatr. We create commands, queries and handl
 Create RegisterCommandHandler, implement relevant interface, copy logic from register service. Can get rid of the Services folder with Authenticaion
 
 Important to note that at the moment, in the LoginQuery and AuthenticationResult, we return User. User is a domain entity (and potential aggregate) but one of the main motications for CQRS in DDD is to have the response as slim as possible. Therefore we will implement a slim UserDto to use here with only the necessary data
+
+### Chapter 7
+
+Adding Mapster
+
+Mapster is a mapping library. Lets say we have
+
+```json
+public record User(
+  int Id,
+  string FirstName,
+  string LastName);
+
+```
+
+AND
+
+```json
+public record UserResponse(
+  int Id,
+  string FirstName,
+  string LastName);
+
+```
+
+Then we can just do - var userResponse = user.Adapt<UserResponse>();
+
+We can also set rules and pass a config (or use global config) - 
+var config = new TypeAdapterConfig();
+config.NewConfig<User, UserResponse>().Map(dest => dest.FullName, src => $"{src.FirstName} {src.LastName}")
+var userResponse = user.Adapt<UserResponse>(config);
+
+
+There is also a global config that is public and static. To use - 
+var config = TypeAdapterConfig.GlobalSettings; OR TypeAdapterConfig<User, UserResponse>.NewConfig().Map......
+config.NewConfig<User, UserResponse>().Map(dest => dest.FullName, src => $"{src.FirstName} {src.LastName}")
+
+
+if you want multiple rules for the same conversion, like user to userresponse, we can use config.ForType
+
+we can ignore non mapped fields by using .IgnoreNonMapped
+
+we can also map conditionally with a 3rd argument, like - 
+config.NewConfig<User, UserResponse>().Map(
+  dest => dest.FullName, 
+  src => $"{src.FirstName} {src.LastName}",
+  src => src.FirstName.StartsWith("a", StringComparison.OrdinalIgnoreCase))
+
+
+We can also combine objects when mapping like using a Tuple - 
+TypeAdapterConfig<(User User, Guid TraceId), UserResponse>.NewConfig()
+  .Map(dest => dest.TraceId, src => src.TraceId)
+  .Map(dest => dest, src => src.User);
+
+var userResponse = (user, traceId).Adapt<UserResponse>();
+
+Theres also BeforeMapping and AfterMapping methods
+
+3 main types of configurations - 
+
+1. Type mappings - one type to anotehr type
+2. Global mappings
+3. ForDestinationType
+
+Lets say we have an interface called IValidatable - and it has a method called Validate. Lets say UserResponse implements this interface.
+
+If we want to call this method whenever we initialize an object of this class, we can do - 
+config.ForDestinationType<IValidatable>().AfterMapping(dest => dest.Validate())
+
+TypeAdapterConfig.GlobalSettings.Default.MapToConstructor(true);
+
+Additionally, instead of using the Adapt method, we can also do - 
+IMapper mapper = new Mapper();
+var userResponse = mapper.Map<UserResponse>(user);
+
+CODE - 
+
+Add Mapster and Mapster>DependencyInjection to API project
+In the controller, any mapping that exists currently can be replaced with 
+_mapper.Map<destinationClassName>(sourceObject)
+
+In this scenario, RegisterRequest and RegisterCommand, we well as LoginRequest and LoginCommand
+will work out of the box because they have the same properties.
+
+AuthenticationResult to AuthenticationResult will need configuration
+so we create APIProject/Common/Mapping/AuthenticationMappingConfig
+Implement the IRegister interface
+
+Because we want mapster to handle its own dependencyinjection, we create a file inside the same folder for this, called DependencyInjection
+
+After configuring Mapster DI, we create another DI file for the presentation layer. We add the AddMappings method there, as well as move the other presentation layer related config like controllers into the presentation DI file and just called the Presentation layer DI method in Program.cs
+
+
+### Chapter 8
+
+#### Validation Behavior - FluentValidation
+
+Mediator pipeline behaviors. We are going to validate a request in mediator before it reaches its corresponding handler
+
+Create folder Application/Common/Behaviors and create ValidationBehaviors.cs. Add Mediator IpipelineBehavior classes
+To wire it together, in Program.cs, add - 
+```
+        services.AddScoped<IPipelineBehavior<RegisterCommand, ErrorOr<AuthenticationResult>>, ValidateRegisterCommandBehavior>();
+```
+
+what happens is that before mediator invokes our handler, it wraps it in whatever class implements the IPipeline Behavior class where the type corresponds to the type of the request that it is currently executing 
+
+Add FluentValidation to Application project
+
+Because we are using Mediator to split our features (each feature sits in its own contained folder), we can just create Validators inside the folders
+
+So we create (inside the Commands/Register folder). AbstractValidator is from FluentValidation
+
+```
+RegisterCommandValidator : AbstractValidator<RegisterCommand>
+```
+
+Add validation to this class. Then add it in DI 
+
+ ```
+         services.AddScoped<IValidator<RegisterCommand>, RegisterCommandValidator>();
+```
+
+Or if we dont want to add each and every validator like this, install the FluentValidator aspnetcore package. Then you can replace the above line with - services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+Then we inject it into our ValidateRegisterCommandBehavior so we can use it like this - 
+var validationResult = await _validator.ValidateAsync(request, cancellationToken);
+
+If there were no validation errors, we invoke our handler using next()
+If there were errors, then we have a list of errors in validationResult, and we are going to convert them to Errors using ErrorOr and then return them
+
+#### Implementing a generic validation pipeline behavior
+Next - we want to change the ValidationBehavior to work for any request type, and not just Register. So we change our class to use Generics
+
+IPipelineBehavior<TRequest, TResponse>where TRequest is a mediator request and TResponse is whatever the request returns
+
+If you have multiple validators for a particular request type, you can call all of them in the constructor and iterate through and invoke all of them in the Handle method
+
+Then add dependency in DI -
+```
+services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+```
+
+### Chapter 9
+
+#### JWT Bearer Authentication in ASP.NET 6
+
+#### JWT
+
+'''json
+// Header (algorithm and token type)
+{ 
+    "alg" : "H256",
+    "typ" : "JWT",
+    "cty" : "JWT"
+}
+```
+
+'''json
+// Payload data
+{ 
+    "sub" : "SOME-GUID",
+    "given-name" : "Nigel",
+    "family-name" : "Gunawardene",
+    "jti" : "SOME-GUID",
+    "exp" : 111111223,
+    "iss" : "BuberDinner",
+    "aud" : "BuberDinner"
+}
+```
+
+'''json
+// Signature
+HMACSHA256(
+$"{base64UrlEncode(header)}.{base64UrlEncode(payload)}","super-secret-key")
+```
+
+We generate a token when the user logs in. BuberDinner is the issuer and the audience. 
+We use the HMACSHA256 algorithm to sign the token with the super secret key (which is exactly 16 bytes)
+
+This will be called in the login endpoint, and will return a token in the response.
+
+Generally, you will have 2 separate systems
+One will be the identity provider - like AAD which will generate the token
+Backend will have to get the public key and validate the token, but in this example, since we are the issuer and the system, we can use Asymmetric key
+
+go to program.cs
+
+Add -  app.UseAuthentication();
+
+To make things simpler, in the Infrastructure DependencyInjection class - 
+Create a new method called AddAuth, move auth lines to that, and call it in the AddInfrastructure method
+
+Now we need to add the Dependencies that the authentication middleware needs, and we need to specify what we want to validate.
+
+Add the Microsoft.AspNetCore.Authentication.JwtBearer package
+
+AuthenticationScheme is simple the "Bearer" scheme
+
+AddAuthentication adds the depencendies and also returns the AuthenticationBuilder, which internally has a map between the authentication scheme and the corresponding authentication handler
+and what we want to do is add our Jwt Bearer Handler as the Authentication handler for the bearer authentication scheme
+
+The actual authentication handler validates the token and makes sure its legit and populates the Identity of the User. We pass the params that we want to validate when configuring the services. 
+
+#### Authorization
+
+Now we have set up authentication, but to determine if an authenticated user is able to access an endpoint or not, we need to setup authorization - 
+
+In the Presentation DependencyInjection, it already calls AddControllers, which calls AddAuthorization for us, so  we dont have to add the dependencies for that.
+
+We need to do add - app.UseAuthorization(); in program.cs
+
+In our pipeline, we hit the useAuthentication (authentication middleware) which finds the correct authentication handler which knows how to handle the bearer authentication scheme (JwtBearerHandler) and it gets whether or not the user is authenticated.
+
+After that, we call the next middleware - Authorization middleware, which decides if the user can actually access the endpoitn
+
+We add the [Authorization] attribute to our ApiController, so that it applies to all controllers that extend it, and we add [AllowAnonymous] to our AuthenticationController so that it can be accessed without authentication.
+
+### Chapter 11
+
+#### Modeling Domains
+
+In this chapter we looked at modeling complex domains before implementing them in our application.
+Link - https://www.youtube.com/watch?v=f6G46rqkePc
+We want to have as many aggregates as possible. This is because each Aggregate is a TRANSACTIONAL BOUNDARY. 
+Bigger aggregates means more work to be done if there is a change to be made. 
+For example, in a menu, we have entities like Host, Dinner and Reviews. If a change is made, we would have to change the entire object. Instead of this, we can remove Host, Dinner and Reviews and replace them with hostId, dinnerId and reviewIds. (Host, Dinner and Reviews will be their own aggregate) In this way, aggregates can refer to each other. Aggregate root in this case would be Menu. 
+When aggregates want to refer to one another, they do it by ID.
+We create a value object which has a single property (the ID of the other aggregate) 
+
+An aggregate is a collection of one or more related entities (and possibly value objects). Each aggregate has a single root entity, referred to as the aggregate root. The aggregate root is responsible for controlling access to all of the members of its aggregate.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

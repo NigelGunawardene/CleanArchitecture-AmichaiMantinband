@@ -1,4 +1,5 @@
-﻿using BuberDinner.Api.Common.Errors;
+﻿using BuberDinner.Api;
+using BuberDinner.Api.Common.Errors;
 using BuberDinner.Api.Filters;
 using BuberDinner.Api.Middleware;
 using BuberDinner.Application;
@@ -10,17 +11,17 @@ var builder = WebApplication.CreateBuilder(args);
 {
     // these are static methods in other projects that configure the DI container with services that are contained there. This is to avoid dependencies.
     builder.Services
+        .AddPresentation()
         .AddApplication()
         .AddInfrastructure(builder.Configuration);
+
     //builder.Services.AddApplication();
     //builder.Services.AddInfrastructure();
 
     // disabling this as well (after middleware)
     //builder.Services.AddControllers(options => options.Filters.Add<ErrorHandlingFilterAttribute>()); // use for config and dependency injection
 
-    builder.Services.AddControllers();
 
-    builder.Services.AddSingleton<ProblemDetailsFactory, BuberDinnerProblemDetailsFactory>();
 }
 
 var app = builder.Build();
@@ -40,6 +41,8 @@ var app = builder.Build();
     //});
 
     app.UseHttpsRedirection();
+    app.UseAuthentication();
+    app.UseAuthorization();
     app.MapControllers();
 
     app.Run();
