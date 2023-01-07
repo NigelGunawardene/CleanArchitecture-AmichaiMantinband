@@ -3,7 +3,7 @@
 namespace BuberDinner.Domain.Common.Models;
 
 // this is the base class that all value objects will inherit from
-public abstract class ValueObject
+public abstract class ValueObject : IEquatable<ValueObject>
 {
     public abstract IEnumerable<object> GetEqualityComponents();
 
@@ -36,6 +36,11 @@ public abstract class ValueObject
         return GetEqualityComponents()
             .Select(x => x?.GetHashCode() ?? 0)
             .Aggregate((x, y) => x ^ y);
+    }
+
+    public bool Equals(ValueObject? other)
+    {
+        return Equals((object?)other);
     }
 }
 
