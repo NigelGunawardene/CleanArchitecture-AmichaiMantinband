@@ -418,12 +418,22 @@ An aggregate is a collection of one or more related entities (and possibly value
 
 #### Implementing AggregateRoot, Entity, ValueObject
 
+In this chapter, we create a new folder in BuberDinner.Domain -> Common -> Models and in here we create the base classes for the different domain objects. Value objects for the aggregate root and for the entity. 
 
 
+### Chapter 13
+
+#### Domain Layer Structure & Skeleton
 
 
+TRANSACTIONAL BOUNDARY 
 
+A DDD aggregate is a cluster of domain objects that can be treated as a single unit. 
+An example may be an order and its line-items, these will be separate objects, but it's useful to treat the order (together with its line items) as a single aggregate, because they conceptually belong together.
 
+Aggregation encapsulates entity objects and value objects and takes the most important entity object as the aggregate root. As the only external portal of aggregation, the aggregate root ensures the consistency of business rules and data.
+
+In this chapter, we start by creating the Menu Aggregate using the base classes that we created in chapter 11. (BubberDinner.Domain.Menu)
 
 
 
