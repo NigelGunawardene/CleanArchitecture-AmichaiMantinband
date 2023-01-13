@@ -435,6 +435,21 @@ Aggregation encapsulates entity objects and value objects and takes the most imp
 
 In this chapter, we start by creating the Menu Aggregate using the base classes that we created in chapter 11. (BubberDinner.Domain.Menu)
 
+Aggregate rules - 
+
+Reference other aggregates by ID
+Changes are committed and rolled back as a whole
+Changes to the aggregate are done through the root
+
+Define each entity as an aggregate (dinner, bill, menu, etc)
+Merge aggregates to enforce invariants (reservation entity moved into dinner entity)
+Merge aggregates that cannot tolerate eventual consistency (domain events)
+
+Data Model - Nothing special
+
+Entity - Two entities are considered equal if they have the same ID
+
+Value objects - Two are considered equal if they have the same value(s)
 
 
 

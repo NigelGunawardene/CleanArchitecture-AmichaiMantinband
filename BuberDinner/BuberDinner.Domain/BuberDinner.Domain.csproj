@@ -10,9 +10,4 @@
     <PackageReference Include="ErrorOr" Version="1.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Guest\" />
-    <Folder Include="Bill\" />
-  </ItemGroup>
-
 </Project>
