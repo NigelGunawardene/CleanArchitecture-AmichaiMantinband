@@ -1,15 +1,15 @@
-﻿using BuberDinner.Application.Common.Interfaces.Authentication;
+﻿using System.Text;
+using BuberDinner.Application.Common.Interfaces.Authentication;
+using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Common.Interfaces.Services;
 using BuberDinner.Infrastructure.Authentication;
-using BuberDinner.Infrastructure.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Infrastructure.Persistence;
+using BuberDinner.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 // we use this class to register our authentication services in DI because we do not want to do it in the API project
 
@@ -20,16 +20,25 @@ public static class DependencyInjection
         this IServiceCollection services,
         ConfigurationManager configuration)
     {
-        services.AddAuth(configuration);
+        services.AddAuth(configuration).AddPersistence();
 
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddPersistence(
+        this IServiceCollection services)
+    {
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IMenuRepository, MenuRepository>();
+
         return services;
     }
 
     public static IServiceCollection AddAuth(
-    this IServiceCollection services,
-    ConfigurationManager configuration)
+        this IServiceCollection services,
+        ConfigurationManager configuration)
     {
         // since we are using the config locally, lets get the settings into a variable
         var jwtSettings = new JwtSettings();

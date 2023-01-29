@@ -8,7 +8,7 @@ using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Services.Authentication.Common;
 using BuberDinner.Domain.Common.Errors;
-using BuberDinner.Domain.Entities;
+using BuberDinner.Domain.UserAggregate;
 using ErrorOr;
 using FluentResults;
 using OneOf;
@@ -28,7 +28,6 @@ public class AuthenticationQueryService : IAuthenticationQueryService
 
     public ErrorOr<AuthenticationResult> Login(string email, string password)
     {
-
         // In a single method, we can return either the desired object, an error or a list of errors
         if (_userRepository.GetUserByEmail(email) is not User user)
         {

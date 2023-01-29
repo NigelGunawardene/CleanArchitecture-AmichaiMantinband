@@ -1,4 +1,5 @@
 @host=https://localhost:7051
+@bearerToken=
 
 GET {{host}}/dinners
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiZWU4N2JhNy00ZjgwLTQ4NmYtYmIwMC02YTNlOTIzNTM3ODUiLCJnaXZlbl9uYW1lIjoiTmlnZWwiLCJmYW1pbHlfbmFtZSI6Ikd1bnoiLCJqdGkiOiI3MGEyMjg4ZC05YWMzLTRmOWUtYjQ3My02OTQzZDdiY2NkZWIiLCJleHAiOjE2NjEzMTA4NDYsImlzcyI6IkJ1YmVyRGlubmVyIiwiYXVkIjoiQnViZXJEaW5uZXIifQ.U4Zeo0kCzsT4iwVi63ZVLqVIbOQld9rIb6kYSkRlHjA
+Authorization: Bearer {{bearerToken}}
