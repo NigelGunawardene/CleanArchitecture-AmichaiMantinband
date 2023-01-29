@@ -8,7 +8,7 @@ using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Services.Authentication.Common;
 using BuberDinner.Domain.Common.Errors;
-using BuberDinner.Domain.User;
+using BuberDinner.Domain.UserAggregate;
 using ErrorOr;
 using FluentResults;
 using OneOf;
