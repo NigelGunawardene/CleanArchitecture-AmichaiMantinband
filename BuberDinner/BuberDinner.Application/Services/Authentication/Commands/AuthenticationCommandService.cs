@@ -30,7 +30,6 @@ public class AuthenticationCommandService : IAuthenticationCommandService
     {
         if (_userRepository.GetUserByEmail(email) is not null)
         {
-
             return Errors.User.DuplicateEmail;
         }
 
@@ -44,6 +43,5 @@ public class AuthenticationCommandService : IAuthenticationCommandService
             user,
             token);
     }
-
 }
 

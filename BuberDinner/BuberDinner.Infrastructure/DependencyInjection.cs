@@ -1,15 +1,15 @@
-﻿using BuberDinner.Application.Common.Interfaces.Authentication;
+﻿using System.Text;
+using BuberDinner.Application.Common.Interfaces.Authentication;
+using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Common.Interfaces.Services;
 using BuberDinner.Infrastructure.Authentication;
-using BuberDinner.Infrastructure.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Infrastructure.Persistence;
+using BuberDinner.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using System.Text;
+using Microsoft.IdentityModel.Tokens;
 
 // we use this class to register our authentication services in DI because we do not want to do it in the API project
 

@@ -25,15 +25,14 @@ public class JwtTokenGenerator : IJwtTokenGenerator
 
     public string GenerateJwtToken(User user)
     {
-
         var signingCredentials = new SigningCredentials(
-            new SymmetricSecurityKey( // we use symmetric key because we are acting as the issuer and the validator
-                Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
-                SecurityAlgorithms.HmacSha256);
+            new SymmetricSecurityKey(// we use symmetric key because we are acting as the issuer and the validator
+            Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
+            SecurityAlgorithms.HmacSha256);
 
-
-        var claims = new[]{
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()!),
             new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName),
             new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),

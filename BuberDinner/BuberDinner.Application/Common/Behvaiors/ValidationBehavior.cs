@@ -30,7 +30,6 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         var validationResult = await _validator.ValidateAsync(request, cancellationToken);
         if (validationResult.IsValid)
         {
-
             return await next(); // call handler if no errors
         }
 
@@ -49,7 +48,6 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         //.Invoke(null, new[] { errors })!;
 
         //return response is not null;
-
     }
 }
 

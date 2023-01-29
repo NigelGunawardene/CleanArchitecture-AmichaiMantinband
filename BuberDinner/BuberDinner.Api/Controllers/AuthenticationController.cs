@@ -34,7 +34,6 @@ public class AuthenticationController : ApiController
         ErrorOr<AuthenticationResult> authResult = await _sender.Send(command);
 
         return authResult.Match(authResult => Ok(_mapper.Map<AuthenticationResponse>(authResult)), errors => Problem(errors)); // pass this to the method defined in the ApiController class
-
     }
 
     [HttpPost("login")]
@@ -56,5 +55,4 @@ public class AuthenticationController : ApiController
     //{
     //    return new AuthenticationResponse(authResult.User.Id, authResult.User.FirstName, authResult.User.LastName, authResult.User.Email, authResult.Token);
     //}
-
 }

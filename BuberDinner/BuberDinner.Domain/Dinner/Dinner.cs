@@ -43,8 +43,22 @@ public sealed class Dinner : AggregateRoot<DinnerId>
     public Location Location { get; }
     public IReadOnlyList<Reservation> Reservations => _reservations;
 
-    private Dinner(DinnerId dinnerId, string name, string description, DateTime startDateTime, DateTime endDateTime, DateTime createdDateTime, DateTime updatedDateTime, DinnerStatus status, bool isPublic, int maxGuests,
-        Price price, HostId hostId, UserId menuId, string imageUrl, Location location)
+    private Dinner(
+        DinnerId dinnerId,
+        string name,
+        string description,
+        DateTime startDateTime,
+        DateTime endDateTime,
+        DateTime createdDateTime,
+        DateTime updatedDateTime,
+        DinnerStatus status,
+        bool isPublic,
+        int maxGuests,
+        Price price,
+        HostId hostId,
+        UserId menuId,
+        string imageUrl,
+        Location location)
     : base(dinnerId)
     {
         Name = name;
@@ -63,8 +77,18 @@ public sealed class Dinner : AggregateRoot<DinnerId>
         Location = location;
     }
 
-    public static Dinner Create(string name, string description, DateTime startDateTime, DateTime endDateTime, bool isPublic, int maxGuests,
-        Price price, HostId hostId, UserId menuId, string imageUrl, Location location)
+    public static Dinner Create(
+        string name,
+        string description,
+        DateTime startDateTime,
+        DateTime endDateTime,
+        bool isPublic,
+        int maxGuests,
+        Price price,
+        HostId hostId,
+        UserId menuId,
+        string imageUrl,
+        Location location)
     {
         return new(DinnerId.CreateUnique(), name, description, startDateTime, endDateTime, DateTime.UtcNow, DateTime.UtcNow, DinnerStatus.Upcoming, isPublic, maxGuests, price, hostId, menuId, imageUrl, location);
     }
