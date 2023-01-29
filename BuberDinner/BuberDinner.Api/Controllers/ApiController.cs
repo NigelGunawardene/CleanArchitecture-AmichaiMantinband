@@ -13,7 +13,6 @@ public class ApiController : ControllerBase
 {
     protected IActionResult Problem(List<Error> errors)
     {
-
         if (errors.Count is 0)
         {
             return Problem();

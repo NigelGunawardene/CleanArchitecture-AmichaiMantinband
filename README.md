@@ -154,7 +154,7 @@ dotnet user-secrets set --project .\BuberDinner.Api\ "JwtSettings:Secret"  "supe
 
 dotnet user-secrets list --project .\BuberDinner.Api\
 
-# To debug in VS Code, go to run and debug and create json thingy. (missing assets popup when you open for the first time). Then click attach and select BuberDinner.Api process
+# To debug in VS Code, go to run and debug and create json. (missing assets popup when you open for the first time). Then click attach and select BuberDinner.Api process
     
 
 ### Chapter 6
@@ -192,34 +192,44 @@ public record UserResponse(
 
 ```
 
-Then we can just do - var userResponse = user.Adapt<UserResponse>();
+Then we can just do - 
+```csharp
+var userResponse = user.Adapt<UserResponse>();
+```
 
 We can also set rules and pass a config (or use global config) - 
+```csharp
 var config = new TypeAdapterConfig();
 config.NewConfig<User, UserResponse>().Map(dest => dest.FullName, src => $"{src.FirstName} {src.LastName}")
 var userResponse = user.Adapt<UserResponse>(config);
+```
 
 
 There is also a global config that is public and static. To use - 
+```csharp
 var config = TypeAdapterConfig.GlobalSettings; OR TypeAdapterConfig<User, UserResponse>.NewConfig().Map......
 config.NewConfig<User, UserResponse>().Map(dest => dest.FullName, src => $"{src.FirstName} {src.LastName}")
-
+```
 
 if you want multiple rules for the same conversion, like user to userresponse, we can use config.ForType
 
 we can ignore non mapped fields by using .IgnoreNonMapped
 
 we can also map conditionally with a 3rd argument, like - 
+```csharp
 config.NewConfig<User, UserResponse>().Map(
   dest => dest.FullName, 
   src => $"{src.FirstName} {src.LastName}",
   src => src.FirstName.StartsWith("a", StringComparison.OrdinalIgnoreCase))
+```
 
 
 We can also combine objects when mapping like using a Tuple - 
+```csharp
 TypeAdapterConfig<(User User, Guid TraceId), UserResponse>.NewConfig()
   .Map(dest => dest.TraceId, src => src.TraceId)
   .Map(dest => dest, src => src.User);
+```
 
 var userResponse = (user, traceId).Adapt<UserResponse>();
 
@@ -316,7 +326,7 @@ services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
 #### JWT
 
-'''json
+```json
 // Header (algorithm and token type)
 { 
     "alg" : "H256",
@@ -325,7 +335,7 @@ services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 }
 ```
 
-'''json
+```json
 // Payload data
 { 
     "sub" : "SOME-GUID",
@@ -338,7 +348,7 @@ services.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 }
 ```
 
-'''json
+```json
 // Signature
 HMACSHA256(
 $"{base64UrlEncode(header)}.{base64UrlEncode(payload)}","super-secret-key")
@@ -385,6 +395,11 @@ After that, we call the next middleware - Authorization middleware, which decide
 
 We add the [Authorization] attribute to our ApiController, so that it applies to all controllers that extend it, and we add [AllowAnonymous] to our AuthenticationController so that it can be accessed without authentication.
 
+### Chapter 10
+
+This was about 
+Mapping Software Logic Using Process Modeling - https://www.youtube.com/watch?v=1pBGc7kKOAA&list=PLzYkqgWkHPKBcDIP5gzLfASkQyTdy0t4k&index=11
+
 ### Chapter 11
 
 #### Modeling Domains
@@ -399,17 +414,101 @@ We create a value object which has a single property (the ID of the other aggreg
 
 An aggregate is a collection of one or more related entities (and possibly value objects). Each aggregate has a single root entity, referred to as the aggregate root. The aggregate root is responsible for controlling access to all of the members of its aggregate.
 
+### Chapter 12
+
+#### Implementing AggregateRoot, Entity, ValueObject
+
+In this chapter, we create a new folder in BuberDinner.Domain -> Common -> Models and in here we create the base classes for the different domain objects. Value objects for the aggregate root and for the entity. 
 
 
+### Chapter 13
+
+#### Domain Layer Structure & Skeleton
 
 
+TRANSACTIONAL BOUNDARY 
+
+A DDD aggregate is a cluster of domain objects that can be treated as a single unit. 
+An example may be an order and its line-items, these will be separate objects, but it's useful to treat the order (together with its line items) as a single aggregate, because they conceptually belong together.
+
+Aggregation encapsulates entity objects and value objects and takes the most important entity object as the aggregate root. As the only external portal of aggregation, the aggregate root ensures the consistency of business rules and data.
+
+In this chapter, we start by creating the Menu Aggregate using the base classes that we created in chapter 11. (BubberDinner.Domain.Menu)
+
+Aggregate rules - 
+
+Reference other aggregates by ID
+Changes are committed and rolled back as a whole
+Changes to the aggregate are done through the root
+
+Define each entity as an aggregate (dinner, bill, menu, etc)
+Merge aggregates to enforce invariants (reservation entity moved into dinner entity)
+Merge aggregates that cannot tolerate eventual consistency (domain events)
+
+Data Model - Nothing special
+
+Entity - Two entities are considered equal if they have the same ID
+
+Value objects - Two are considered equal if they have the same value(s)
 
 
+### Chapter 14
+
+#### REST + DDD + CA + CQRS - When it all plays together
+
+In this chapter, we create a Menu and understand which logic goes into which layer. 
+
+Note that we are going to skip the logic where a USER becomes a HOST. 
+
+##### PRESENTATION LAYER
+
+BuberDinner.Contracts:
+Menus - CreateMenuRequest and MenuResponse
+
+BuberDinner.Api:
+Common - Mapping - MenuMappingConfig
+Common - Controllers - MenusController
+
+##### APPLICATION LAYER
+
+Menu - Commands - CreateMenu - CreateMenuCommand, CreateMenuCommandHandler, CreateMenuCommandValidator
+
+Common - Interfaces - Persistence - IMenuRepository
+
+##### INFRASTRUCTURE LAYER
+
+Persistence - MenuRepository, DependencyInjection
+
+#####  DOMAIN LAYER
+
+MenuAggregate - Entities - MenuItem, MenuSection
+
+MenuAggregate - ValueObjects - MenuId, MenuItemId, MenuSectionId
+
+MenuReviewAggregate - MenuReview
+
+MenuReviewAggregate - ValueObjects - MenuReviewId
 
 
+##### Creating files
 
+Create Docs/Api/Api.Menu.md and create the request/response models for documentation best practices
+In BuberDinner.Contracts, create the Menu request and response, mirroring the documentation
 
+In BuberDinner.Api, create our new controller
 
+Then we create the corresponding Command for mediatr (from the request) which will  invoke the CreateMenuCommandHandler
+
+In BuberDinner.Application, create Command and CommandHandler
+
+Now we have 3 copies of the Menu - the MenuRequest in the ContractLayer, the MenuCommand in the ApplicationLayer and the Menu Aggregate in the DomainLayer. The reason for this is that in future as our application grows, we can allow each layer to grow and morph independently of the other layers. All we have to do is update the relevant layer and update the mapping with the other layers. 
+
+After creating the handler, we work on the persistence layer.
+Add the IMenuRepository to the ApplicationLayer and wire it up in the handler
+
+Then implement the MenuRepository in the InfrastructureLayer
+
+Then create the Validator
 
 
 

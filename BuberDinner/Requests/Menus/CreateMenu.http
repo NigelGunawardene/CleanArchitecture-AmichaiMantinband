@@ -1,0 +1,24 @@
+@host=https://localhost:7051
+@hostId=1
+@bearerToken=
+
+POST {{host}}/hosts/{{hostId}}/menus
+Content-Type: application/json
+Authorization: Bearer {{bearerToken}}
+
+{
+    "name": "YummyMenu",
+    "description": "A menu with yummy food",
+    "sections": [
+        {
+            "name": "Appetizers",
+            "description": "Starters",
+            "items": [
+                {
+                    "name": "Pickles",
+                    "description": "Deep fried pickles"
+                }
+            ]
+        }
+    ]
+}

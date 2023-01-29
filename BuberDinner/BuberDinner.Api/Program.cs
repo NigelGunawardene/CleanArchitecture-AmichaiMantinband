@@ -20,8 +20,6 @@ var builder = WebApplication.CreateBuilder(args);
 
     // disabling this as well (after middleware)
     //builder.Services.AddControllers(options => options.Filters.Add<ErrorHandlingFilterAttribute>()); // use for config and dependency injection
-
-
 }
 
 var app = builder.Build();

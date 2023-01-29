@@ -1,15 +1,14 @@
 ﻿using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Services.Authentication.Common;
+using BuberDinner.Domain.Common.Errors;
+using BuberDinner.Domain.UserAggregate;
 using ErrorOr;
 using MediatR;
-using BuberDinner.Domain.Common.Errors;
-using BuberDinner.Domain.Entities;
 
 namespace BuberDinner.Application.Authentication.Commands.Register;
 public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<AuthenticationResult>>
 {
-
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly IUserRepository _userRepository;
 
@@ -25,17 +24,11 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ErrorOr<A
 
         if (_userRepository.GetUserByEmail(command.Email) is not null)
         {
-
             return Errors.User.DuplicateEmail;
         }
 
-        var user = new User
-        {
-            FirstName = command.FirstName,
-            LastName = command.LastName,
-            Email = command.Email,
-            Password = command.Password
-        };
+        var user = User.Create(command.FirstName, command.LastName, command.Email, command.Password);
+
 
         _userRepository.Add(user);
 
