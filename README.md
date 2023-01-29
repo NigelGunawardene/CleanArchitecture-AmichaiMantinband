@@ -490,6 +490,15 @@ MenuReviewAggregate - MenuReview
 MenuReviewAggregate - ValueObjects - MenuReviewId
 
 
+##### Creating files
+
+Create Docs/Api/Api.Menu.md and create the request/response models for documentation best practices
+In BuberDinner.Contracts, create the Menu request and response, mirroring the documentation
+
+In BuberDinner.Api, create our new controller
+
+
+
 
 
 
