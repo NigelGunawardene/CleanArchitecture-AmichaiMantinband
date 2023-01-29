@@ -8,16 +8,21 @@ using BuberDinner.Domain.Common.Models;
 namespace BuberDinner.Domain.HostAggregate.ValueObjects;
 public sealed class HostId : ValueObject
 {
-    public Guid Value { get; }
+    public string Value { get; }
 
-    private HostId(Guid value)
+    private HostId(string value)
     {
         Value = value;
     }
 
-    public static HostId CreateUnique()
+    //public static HostId CreateUnique()
+    //{
+    //    return new(Guid.NewGuid());
+    //}
+
+    public static HostId Create(string id)
     {
-        return new(Guid.NewGuid());
+        return new(id);
     }
 
     public override IEnumerable<object> GetEqualityComponents()

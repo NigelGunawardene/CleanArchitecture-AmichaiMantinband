@@ -28,19 +28,20 @@ public sealed class Menu : AggregateRoot<MenuId>
     public DateTime UpdatedDateTime { get; }
 
 
-    private Menu(MenuId menuId, string name, string description, HostId hostId, DateTime createdDateTime, DateTime updatedDateTime)
+    private Menu(MenuId menuId, HostId hostId, string name, string description, List<MenuSection> sections, DateTime createdDateTime, DateTime updatedDateTime)
         : base(menuId)
     {
+        HostId = hostId;
         Name = name;
         Description = description;
+        _sections = sections;
         AverageRating = AverageRating.CreateNew();
-        HostId = hostId;
         CreatedDateTime = createdDateTime;
         UpdatedDateTime = updatedDateTime;
     }
 
-    public static Menu Create(string name, string description, HostId hostId)
+    public static Menu Create(HostId hostId, string name, string description, List<MenuSection> sections)
     {
-        return new(MenuId.CreateUnique(), name, description, hostId, DateTime.UtcNow, DateTime.UtcNow);
+        return new(MenuId.CreateUnique(), hostId, name, description, sections, DateTime.UtcNow, DateTime.UtcNow);
     }
 }

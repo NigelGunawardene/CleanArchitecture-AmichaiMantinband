@@ -497,6 +497,19 @@ In BuberDinner.Contracts, create the Menu request and response, mirroring the do
 
 In BuberDinner.Api, create our new controller
 
+Then we create the corresponding Command for mediatr (from the request) which will  invoke the CreateMenuCommandHandler
+
+In BuberDinner.Application, create Command and CommandHandler
+
+Now we have 3 copies of the Menu - the MenuRequest in the ContractLayer, the MenuCommand in the ApplicationLayer and the Menu Aggregate in the DomainLayer. The reason for this is that in future as our application grows, we can allow each layer to grow and morph independently of the other layers. All we have to do is update the relevant layer and update the mapping with the other layers. 
+
+After creating the handler, we work on the persistence layer.
+Add the IMenuRepository to the ApplicationLayer and wire it up in the handler
+
+Then implement the MenuRepository in the InfrastructureLayer
+
+Then create the Validator
+
 
 
 

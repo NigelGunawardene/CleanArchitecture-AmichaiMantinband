@@ -202,6 +202,9 @@ dotnet_diagnostic.SA1413.severity = none
 # SA1402: File may only contain a single type
 dotnet_diagnostic.SA1402.severity = none
 
+# SA1116: The parameters should begin on the line after the declaration, whenever the parameter span across multiple lines
+dotnet_diagnostic.SA1116.severity = none
+
 ###############################
 # VB Coding Conventions       #
 ###############################

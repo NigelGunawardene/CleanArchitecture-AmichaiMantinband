@@ -38,8 +38,8 @@ public sealed class Host : AggregateRoot<HostId>
         UpdatedDateTime = updatedDateTime;
     }
 
-    public static Host Create(string firstName, string lastName, string profileImage, AverageRating averageRating, UserId userId)
+    public static Host Create(HostId hostId, string firstName, string lastName, string profileImage, AverageRating averageRating, UserId userId)
     {
-        return new(HostId.CreateUnique(), firstName, lastName, profileImage, averageRating, userId, DateTime.UtcNow, DateTime.UtcNow);
+        return new(hostId, firstName, lastName, profileImage, averageRating, userId, DateTime.UtcNow, DateTime.UtcNow);
     }
 }
