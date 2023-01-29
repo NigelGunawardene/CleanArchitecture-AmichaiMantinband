@@ -11,6 +11,7 @@ using BuberDinner.Domain.Host.ValueObjects;
 using BuberDinner.Domain.Menu.Entities;
 using BuberDinner.Domain.Menu.ValueObjects;
 using BuberDinner.Domain.MenuReview.ValueObjects;
+using BuberDinner.Domain.User.ValueObjects;
 
 namespace BuberDinner.Domain.Dinner;
 

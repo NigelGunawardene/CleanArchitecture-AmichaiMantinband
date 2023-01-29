@@ -452,10 +452,42 @@ Entity - Two entities are considered equal if they have the same ID
 Value objects - Two are considered equal if they have the same value(s)
 
 
+### Chapter 14
 
+#### REST + DDD + CA + CQRS - When it all plays together
 
+In this chapter, we create a Menu and understand which logic goes into which layer. 
 
+Note that we are going to skip the logic where a USER becomes a HOST. 
 
+##### PRESENTATION LAYER
+
+BuberDinner.Contracts:
+Menus - CreateMenuRequest and MenuResponse
+
+BuberDinner.Api:
+Common - Mapping - MenuMappingConfig
+Common - Controllers - MenusController
+
+##### APPLICATION LAYER
+
+Menu - Commands - CreateMenu - CreateMenuCommand, CreateMenuCommandHandler, CreateMenuCommandValidator
+
+Common - Interfaces - Persistence - IMenuRepository
+
+##### INFRASTRUCTURE LAYER
+
+Persistence - MenuRepository, DependencyInjection
+
+#####  DOMAIN LAYER
+
+MenuAggregate - Entities - MenuItem, MenuSection
+
+MenuAggregate - ValueObjects - MenuId, MenuItemId, MenuSectionId
+
+MenuReviewAggregate - MenuReview
+
+MenuReviewAggregate - ValueObjects - MenuReviewId
 
 
 

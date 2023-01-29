@@ -8,7 +8,7 @@ using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Application.Services.Authentication.Common;
 using BuberDinner.Domain.Common.Errors;
-using BuberDinner.Domain.Entities;
+using BuberDinner.Domain.User;
 using ErrorOr;
 using FluentResults;
 using OneOf;
@@ -34,13 +34,7 @@ public class AuthenticationCommandService : IAuthenticationCommandService
             return Errors.User.DuplicateEmail;
         }
 
-        var user = new User
-        {
-            FirstName = firstName,
-            LastName = lastName,
-            Email = email,
-            Password = password
-        };
+        var user = User.Create(firstName, lastName, email, password);
 
         _userRepository.Add(user);
 

@@ -33,6 +33,7 @@ public sealed class Menu : AggregateRoot<MenuId>
     {
         Name = name;
         Description = description;
+        AverageRating = AverageRating.CreateNew();
         HostId = hostId;
         CreatedDateTime = createdDateTime;
         UpdatedDateTime = updatedDateTime;

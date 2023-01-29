@@ -9,7 +9,7 @@ using BuberDinner.Domain.Host.ValueObjects;
 using BuberDinner.Domain.Menu.ValueObjects;
 using BuberDinner.Domain.User.ValueObjects;
 
-namespace BuberDinner.Domain.Entities;
+namespace BuberDinner.Domain.User;
 
 public sealed class User : AggregateRoot<UserId>
 {

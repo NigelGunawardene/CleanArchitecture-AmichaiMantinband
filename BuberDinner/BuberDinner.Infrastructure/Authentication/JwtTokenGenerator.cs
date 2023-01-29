@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BuberDinner.Application.Common.Interfaces.Authentication;
 using BuberDinner.Application.Common.Interfaces.Services;
-using BuberDinner.Domain.Entities;
+using BuberDinner.Domain.User;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
