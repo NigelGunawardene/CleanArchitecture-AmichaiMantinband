@@ -19,6 +19,12 @@ public sealed class MenuItem : Entity<MenuItemId>
         Description = description;
     }
 
+#pragma warning disable CS8618
+    private MenuItem()
+    {
+    }
+#pragma warning restore CS8618
+
     public static MenuItem Create(string name, string description)
     {
         return new(MenuItemId.CreateUnique(), name, description);
