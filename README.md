@@ -611,9 +611,20 @@ Then go back to our DbContext and tell EFC to scan for Configurations and apply 
 
 After that, run the migration creation again
 
+Now we create an SQL Server instance inside a docker container
 
+docker ps - show what is currently running
 
+docker image ls - list of existing images
 
+docker pull mcr.microsoft.com/mssql/server:2022-latest
+
+docker run -e 'HOMEBREW_NO_ENV_FILTERING=1' -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=amiko123!' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
+
+docker container ls
+
+The docker container should be running. Go back to console
+dotnet ef database update -p BuberDinner.Infrastructure -s BuberDinner.Api --connection "Server=localhost;Database=BuberDinner;User ID=sa;Password=amiko123\!;Encrypt=false"
 
 
 
