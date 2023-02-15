@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using BuberDinner.Application.Common.Interfaces.Persistence;
 using BuberDinner.Domain.MenuAggregate;
 
-namespace BuberDinner.Infrastructure.Persistence;
+namespace BuberDinner.Infrastructure.Persistence.Repositories;
 public class MenuRepository : IMenuRepository
 {
     private static readonly List<Menu> _menus = new();
