@@ -593,7 +593,23 @@ public IReadOnlyList<MenuSection> Sections => _sections.AsReadOnly();
 ```
 EF cannot populate the Sections property, as it is readonly. We need to populate the underlying field.
 
+Ensure dotnet-ef CLI tool is installed
 
+dotnet ef migrations add InitialCreate --project BuberDinner.Infrastructure --startup-project BuberDinner.Api
+dotnet ef migrations add InitialCreate -p BuberDinner.Infrastructure -s BuberDinner.Api
+
+For this to work, we need the API project to reference EntityFramework.Design Nuget package
+
+Update dotnet-ef global CLI tool:
+dotnet tool update --global dotnet-ef
+
+But we get an error because EFC needs a parameterless constructor. So we need to create one in the Aggregate root and other entities - AggregateRoot, Entity, Menu, MenuSection, MenuItem
+
+EFC needs to use reflection on these classes, so it needs a private parameterless constructor, and properties should have getters and private setters
+
+Then go back to our DbContext and tell EFC to scan for Configurations and apply them
+
+After that, run the migration creation again
 
 
 
