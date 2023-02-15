@@ -510,13 +510,88 @@ Then implement the MenuRepository in the InfrastructureLayer
 
 Then create the Validator
 
+### Chapter 15
+#### ENTITY FRAMEWORK & DDD
+
+1. DDD and EF Core - Enforcing DDD principles
+2. 3 Steps for mapping an aggregate to a relational database
+3. EF Core's Fluent API and DDD
+4. SQL Server in a Docker container
+5. Migrations using the EF Core CLI
+6. VS Code and SQL Server
 
 
+Why is it a big deal?
+
+Persistence ignorance - Our domain layer logic should not be defined based on the database choice. We should not care about our database solution
+
+1. DDD Building block 1
+Aggregate identifier should be unique within the entire system
+
+2. DDD Building block 2
+Entity identifier should be unique within the aggregate 
+
+3. DDD Building block 3 
+Value objects do NOT have an identifier
+
+4. DDD Building block 4 
+Changes to one aggregate should not affect other aggregates
+
+The ID of an entity should not be the primary key of that table
+If it is, then when we delete an entity with ID 1 (Having entities with ID 1 in different aggregates is legal), we will then delete both entities with ID 1.
+
+The mapping will be done through configurations
+
+---
+
+3 steps for mapping an aggregate to a relational DB
+1. Tables
+2. Foregn Keys
+3. Types and other constraints
+
+Step 1
+First the main table contains all our non-complex properties in Menu (MenuId, Name, Description, AverageRating, NumOfRatings, HostId, CreateDateTime, UpdatedDateTime)
+
+Then MenuSections table has MenuSectionId, Name, Description, MenuId (FK)
+
+MenuItems has MenuItemId, Name, Description, MenuSectionId, MenuId
+
+MenuDinnerIds has DinnerId, MenuId, Id
+
+MenuReviewsIds has MenuReviewId, MenuId, Id
 
 
+Step 2
 
+Decide on primary keys and foreign keys
 
+For example, the PK of MenuSections will be a composite key of MenuSectionId + MenuId
 
+The other option is to use a Surrogate key (A key of any type that exists for the sole purpose of uniquely identifying a record in a table)/ Shadow property which will be auto-incremented
+
+The PK of the MenuItems table will be MenuItemId + MenuSectionId + MenuId
+
+MenuDinnerIds and MenuReviewIds tables will have an intrduced ID property to make the PK unique - DinnerId + MenuId + Id
+
+---
+
+Additionally, when we delete an aggregate (Menu), we want to delete all inner entities to be deleted as well.
+Thats why we introduce a concept called **Owned Entities**: EF Core allows you to model entity types that can only ever appear on navigation properties of other entity types. These are called owned entity types. The entity containing an owned entity type is its owner. 
+
+Coding:
+
+Add the EF Packages to infrastructure and create Persistence/BuberDinnerDBContext
+Register it in the AddPersistence method in DI. Also need to install EFCore.SQL nuget (or whichever db package)
+
+Now change MenuRepository to use our DbContext. Persistence Ignorance can be observed here. The database solution changed but no one knows/cares except our Infratructure layer
+
+Now we need to define the mapping between Menu and our tables. Create Persistence/Configurations/MenuConfigurations
+
+One thing to keep in mind while configuring is in the MenuAggregate, and look at this line:
+```c#
+public IReadOnlyList<MenuSection> Sections => _sections.AsReadOnly();
+```
+EF cannot populate the Sections property, as it is readonly. We need to populate the underlying field.
 
 
 
