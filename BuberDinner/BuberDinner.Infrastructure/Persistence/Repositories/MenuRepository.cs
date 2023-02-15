@@ -9,9 +9,15 @@ using BuberDinner.Domain.MenuAggregate;
 namespace BuberDinner.Infrastructure.Persistence.Repositories;
 public class MenuRepository : IMenuRepository
 {
-    private static readonly List<Menu> _menus = new();
+    private readonly BuberDinnerDbContext _dbContext;
+
+    public MenuRepository(BuberDinnerDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+    //private static readonly List<Menu> _menus = new();
     public void Add(Menu menu)
     {
-        _menus.Add(menu);
+        _dbContext.Add(menu);
     }
 }

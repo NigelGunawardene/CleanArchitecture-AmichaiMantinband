@@ -20,10 +20,10 @@ public sealed class Menu : AggregateRoot<MenuId>
     public string Name { get; }
     public string Description { get; }
     public AverageRating AverageRating { get; }
-    public IReadOnlyList<MenuSection> Sections => _sections;
+    public IReadOnlyList<MenuSection> Sections => _sections.AsReadOnly();
     public HostId HostId { get; }
-    public IReadOnlyList<DinnerId> DinnerIds => _dinnerIds;
-    public IReadOnlyList<MenuReviewId> MenuReviewIds => _menuReviewIds;
+    public IReadOnlyList<DinnerId> DinnerIds => _dinnerIds.AsReadOnly();
+    public IReadOnlyList<MenuReviewId> MenuReviewIds => _menuReviewIds.AsReadOnly();
     public DateTime CreatedDateTime { get; }
     public DateTime UpdatedDateTime { get; }
 
