@@ -510,19 +510,121 @@ Then implement the MenuRepository in the InfrastructureLayer
 
 Then create the Validator
 
+### Chapter 15
+#### ENTITY FRAMEWORK & DDD
+
+1. DDD and EF Core - Enforcing DDD principles
+2. 3 Steps for mapping an aggregate to a relational database
+3. EF Core's Fluent API and DDD
+4. SQL Server in a Docker container
+5. Migrations using the EF Core CLI
+6. VS Code and SQL Server
 
 
+Why is it a big deal?
+
+Persistence ignorance - Our domain layer logic should not be defined based on the database choice. We should not care about our database solution
+
+1. DDD Building block 1
+Aggregate identifier should be unique within the entire system
+
+2. DDD Building block 2
+Entity identifier should be unique within the aggregate 
+
+3. DDD Building block 3 
+Value objects do NOT have an identifier
+
+4. DDD Building block 4 
+Changes to one aggregate should not affect other aggregates
+
+The ID of an entity should not be the primary key of that table
+If it is, then when we delete an entity with ID 1 (Having entities with ID 1 in different aggregates is legal), we will then delete both entities with ID 1.
+
+The mapping will be done through configurations
+
+---
+
+3 steps for mapping an aggregate to a relational DB
+1. Tables
+2. Foregn Keys
+3. Types and other constraints
+
+Step 1
+First the main table contains all our non-complex properties in Menu (MenuId, Name, Description, AverageRating, NumOfRatings, HostId, CreateDateTime, UpdatedDateTime)
+
+Then MenuSections table has MenuSectionId, Name, Description, MenuId (FK)
+
+MenuItems has MenuItemId, Name, Description, MenuSectionId, MenuId
+
+MenuDinnerIds has DinnerId, MenuId, Id
+
+MenuReviewsIds has MenuReviewId, MenuId, Id
 
 
+Step 2
 
+Decide on primary keys and foreign keys
 
+For example, the PK of MenuSections will be a composite key of MenuSectionId + MenuId
 
+The other option is to use a Surrogate key (A key of any type that exists for the sole purpose of uniquely identifying a record in a table)/ Shadow property which will be auto-incremented
 
+The PK of the MenuItems table will be MenuItemId + MenuSectionId + MenuId
 
+MenuDinnerIds and MenuReviewIds tables will have an intrduced ID property to make the PK unique - DinnerId + MenuId + Id
 
+---
 
+Additionally, when we delete an aggregate (Menu), we want to delete all inner entities to be deleted as well.
+Thats why we introduce a concept called **Owned Entities**: EF Core allows you to model entity types that can only ever appear on navigation properties of other entity types. These are called owned entity types. The entity containing an owned entity type is its owner. 
 
+Coding:
 
+Add the EF Packages to infrastructure and create Persistence/BuberDinnerDBContext
+Register it in the AddPersistence method in DI. Also need to install EFCore.SQL nuget (or whichever db package)
+
+Now change MenuRepository to use our DbContext. Persistence Ignorance can be observed here. The database solution changed but no one knows/cares except our Infratructure layer
+
+Now we need to define the mapping between Menu and our tables. Create Persistence/Configurations/MenuConfigurations
+
+One thing to keep in mind while configuring is in the MenuAggregate, and look at this line:
+```c#
+public IReadOnlyList<MenuSection> Sections => _sections.AsReadOnly();
+```
+EF cannot populate the Sections property, as it is readonly. We need to populate the underlying field.
+
+Ensure dotnet-ef CLI tool is installed
+
+dotnet ef migrations add InitialCreate --project BuberDinner.Infrastructure --startup-project BuberDinner.Api
+dotnet ef migrations add InitialCreate -p BuberDinner.Infrastructure -s BuberDinner.Api
+
+For this to work, we need the API project to reference EntityFramework.Design Nuget package
+
+Update dotnet-ef global CLI tool:
+dotnet tool update --global dotnet-ef
+
+But we get an error because EFC needs a parameterless constructor. So we need to create one in the Aggregate root and other entities - AggregateRoot, Entity, Menu, MenuSection, MenuItem
+
+EFC needs to use reflection on these classes, so it needs a private parameterless constructor, and properties should have getters and private setters
+
+Then go back to our DbContext and tell EFC to scan for Configurations and apply them
+
+After that, run the migration creation again
+
+Now we create an SQL Server instance inside a docker container
+
+docker ps - show what is currently running
+
+docker image ls - list of existing images
+
+docker pull mcr.microsoft.com/mssql/server:2022-latest
+
+docker run -e 'HOMEBREW_NO_ENV_FILTERING=1' -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=amiko123!' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
+
+docker container ls
+
+The docker container should be running. Go back to console
+dotnet ef database update -p BuberDinner.Infrastructure -s BuberDinner.Api --connection "Server=localhost;Database=BuberDinner;User ID=sa;Password=amiko123\!;Encrypt=false"
 
 
 
