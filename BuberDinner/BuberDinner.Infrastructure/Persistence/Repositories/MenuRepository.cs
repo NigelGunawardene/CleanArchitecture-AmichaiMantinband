@@ -19,5 +19,6 @@ public class MenuRepository : IMenuRepository
     public void Add(Menu menu)
     {
         _dbContext.Add(menu);
+        _dbContext.SaveChanges();
     }
 }
