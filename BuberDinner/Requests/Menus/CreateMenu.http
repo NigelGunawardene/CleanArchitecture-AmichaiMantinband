@@ -2,6 +2,8 @@
 @hostId=1
 @bearerToken=
 
+
+
 POST {{host}}/hosts/{{hostId}}/menus
 Content-Type: application/json
 Authorization: Bearer {{bearerToken}}

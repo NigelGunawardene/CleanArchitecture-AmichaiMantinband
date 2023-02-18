@@ -595,13 +595,17 @@ EF cannot populate the Sections property, as it is readonly. We need to populate
 
 Ensure dotnet-ef CLI tool is installed
 
+
+---
 dotnet ef migrations add InitialCreate --project BuberDinner.Infrastructure --startup-project BuberDinner.Api
 dotnet ef migrations add InitialCreate -p BuberDinner.Infrastructure -s BuberDinner.Api
+
+---
 
 For this to work, we need the API project to reference EntityFramework.Design Nuget package
 
 Update dotnet-ef global CLI tool:
-dotnet tool update --global dotnet-ef
+dotnet tool update --global dotnet-ef 
 
 But we get an error because EFC needs a parameterless constructor. So we need to create one in the Aggregate root and other entities - AggregateRoot, Entity, Menu, MenuSection, MenuItem
 
@@ -624,9 +628,11 @@ docker run -e 'HOMEBREW_NO_ENV_FILTERING=1' -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=a
 docker container ls
 
 The docker container should be running. Go back to console
-dotnet ef database update -p BuberDinner.Infrastructure -s BuberDinner.Api --connection "Server=localhost;Database=BuberDinner;User ID=sa;Password=amiko123\!;Encrypt=false"
+dotnet ef database update -p BuberDinner.Infrastructure -s BuberDinner.Api --connection "Server=localhost;Database=BuberDinner;User ID=sa;Password=amiko123!;Encrypt=false"
 
 
+to test docker container sql connection : 
+docker exec -it <container-name> /opt/mssql-tools/bin/sqlcmd -S localhost -U sa
 
 
 
